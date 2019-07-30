@@ -29,19 +29,32 @@ func Test_handler(t *testing.T) {
 	}
 }
 
-var testArray = []float32{-90, -90, -30, -30, -90, -90}
+var oneSpikeArray = []float32{-90, -90, -30, -30, -90, -90}
+var twoSpikeArray = []float32{-90, -90, -30, -30, -90, -90, -30, -30, -90, -90}
 
 func Test_calcAverage(t *testing.T) {
-	got := calcAverage(testArray)
+	got := calcAverage(oneSpikeArray)
 	if got != -70 {
 		t.Errorf("calcAverage() = %v, want %v", got, -70)
 	}
 }
 
-func Test_findPowerSpikes(t *testing.T) {
-	got := findPowerSpikes(testArray)
+func Test_findPowerSpikes_CountsTheSpikes(t *testing.T) {
+	got := findPowerSpikes(oneSpikeArray)
 	if len(got) != 1 {
 		t.Errorf("findPowerSpikes() = %v, want %v", len(got), 1)
+	}
+	if len(got[0]) != 2 {
+		t.Errorf("Spike length= %v, want %v", len(got[0]), 2)
+	} else if got[0][0] != 2 {
+		t.Errorf("Spike start= %v, want %v", got[0][0], 2)
+	} else if got[0][1] != 3 {
+		t.Errorf("Spike end= %v, want %v", got[0][1], 3)
+	}
+	got = findPowerSpikes(twoSpikeArray)
+	want := [][]int{{2, 3}, {6, 7}}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got spikes=%v, want %v", got, want)
 	}
 }
 
@@ -58,7 +71,7 @@ func Test_processFFT(t *testing.T) {
 		want []signal
 	}{
 		{name: "test1",
-			args: args{fftArray: testArray},
+			args: args{fftArray: oneSpikeArray},
 			want: signals},
 		// s := signal{centerFrequency: 1500, bandwidth: 20, power: 10, name: "test"}
 		// expected := []signal{s}

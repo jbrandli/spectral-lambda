@@ -24,14 +24,9 @@ func handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 }
 
 func processFFT(fftArray []float32) []signal {
-	s := signal{centerFrequency: 1500, bandwidth: 20, power: 10, name: "test"}
+	s := signal{centerFrequency: 1500, bandwidth: 20, power: 10}
 	var signals []signal
-	var avPower = calcAverage(fftArray)
-	for idx, power := range fftArray {
-		if idx < len(fftArray)-1 && power > avPower && fftArray[idx+1] < avPower {
-
-		}
-	}
+	// var avPower = calcAverage(fftArray)
 	signals = append(signals, s)
 	return signals
 }
@@ -39,19 +34,17 @@ func processFFT(fftArray []float32) []signal {
 func findPowerSpikes(fftArray []float32) [][]int {
 	var spike []int
 	var spikes [][]int
-	var count int
-	count = 0
 	var inSignal bool
 	avPowr := calcAverage(fftArray)
 	for idx, power := range fftArray {
-		if power > avPowr && !inSignal{
+		if power > avPowr && !inSignal {
 			spike = append(spike, idx)
-			
-		} else if power > avPowr && !(fftArray[idx+1] > avPowr) && inSignal{
+			inSignal = true
+		} else if power > avPowr && !(fftArray[idx+1] > avPowr) && inSignal {
 			spike = append(spike, idx)
-			spikes[count] = append(spikes[count], spike)
-			spike = []int
-			count++;
+			spikes = append(spikes, spike)
+			spike = nil
+			inSignal = false
 		}
 	}
 	return spikes
